@@ -16,6 +16,11 @@ app.use(cors({
   credentials: true
 }));
 
+// Route ทดสอบ
+app.get("/", (req, res) => {
+  res.send("Hello GameShop 🚀");
+});
+
 app.use("/users", userRouter);
 
 // ใช้พอร์ตจาก environment variable ของ Render หรือ fallback เป็น 3000 สำหรับ local

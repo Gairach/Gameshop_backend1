@@ -18,7 +18,7 @@ app.use(cors({
 
 // Route ทดสอบ
 app.get("/", (req, res) => {
-  res.send("Hello GameShop 🚀");
+  res.send("Hello GameShop");
 });
 
 app.use("/users", userRouter);

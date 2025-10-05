@@ -13,8 +13,9 @@ app.use(cors({
 
 app.use("/users", userRouter);
 
-const PORT = 3000;
-const HOST = "localhost"; // เปลี่ยนจาก 0.0.0.0
+// ใช้พอร์ตจาก environment variable ของ Render
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = "0.0.0.0";
 app.listen(PORT, HOST, () => {
   console.log(`🚀 Server running on http://${HOST}:${PORT}`);
 });

@@ -39,6 +39,31 @@ export const registerUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: (err as Error).message });
   }
 };
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const snapshot = await db.collection("users").get();
+
+    const users = snapshot.docs.map(doc => {
+      const data = doc.data();
+      delete (data as any).password; // ไม่ส่งรหัสผ่านกลับ
+      return {
+        uid: doc.id,
+        username: data.username,
+        role: data.role,
+        fullname: data.fullname || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        imageProfile: data.imageProfile || '',
+        wallet: data.wallet || 0
+      };
+    });
+
+    res.status(200).json(users);
+  } catch (err) {
+    console.error("Error fetching all users:", err);
+    res.status(500).json({ error: "ไม่สามารถดึงรายชื่อผู้ใช้ได้" });
+  }
+};
 
 
 // =======================
@@ -132,4 +157,35 @@ export const updateProfile = async (req: Request, res: Response) => {
   }
 };
 
+export const topup = async (req: Request, res: Response) => {
+  try {
+    const { userId, amount } = req.body;
+    if (!userId || !amount || amount <= 0) {
+      return res.status(400).json({ error: "ข้อมูลไม่ถูกต้อง" });
+    }
+
+    const userRef = db.collection("users").doc(userId);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
+
+    const currentWallet = userDoc.data()?.wallet || 0;
+
+    // เพิ่มเงินเข้า wallet
+    await userRef.update({ wallet: currentWallet + amount });
+
+    // บันทึกประวัติเติมเงิน
+    await db.collection("history").add({
+      userId,
+      type: "topup",
+      amount: amount,
+      createdAt: new Date().toISOString(),
+    });
+
+    res.json({ message: "เติมเงินสำเร็จ", newWallet: currentWallet + amount });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "เติมเงินไม่สำเร็จ" });
+  }
+};
 

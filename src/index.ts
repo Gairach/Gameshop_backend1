@@ -1,5 +1,10 @@
 import express from "express";
 import userRouter from "./routes/user";
+import gameRouter from "./routes/game";
+import cartRouter from "./routes/cart";
+import historyRouter from './routes/history';
+import libraryRouter from './routes/library';
+import discountsRouter from './routes/discounts';
 import cors from "cors";
 
 const app = express();
@@ -22,7 +27,11 @@ app.get("/", (req, res) => {
 });
 
 app.use("/users", userRouter);
-
+app.use("/games", gameRouter);
+app.use('/discounts', discountsRouter);
+app.use("/cart", cartRouter)
+app.use('/history', historyRouter);
+app.use('/library', libraryRouter);
 // ใช้พอร์ตจาก environment variable ของ Render หรือ fallback เป็น 3000 สำหรับ local
 const PORT = Number(process.env.PORT) || 3000;
 // สำหรับ Render ต้อง bind กับ 0.0.0.0
